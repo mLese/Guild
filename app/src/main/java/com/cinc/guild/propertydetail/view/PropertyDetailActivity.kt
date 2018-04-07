@@ -2,6 +2,7 @@ package com.cinc.guild
 
 import android.os.Bundle
 import android.support.design.widget.CollapsingToolbarLayout
+import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
@@ -11,29 +12,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
-import com.google.gson.GsonBuilder
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-import java.util.concurrent.TimeUnit
 
-class PropertyDetailActivity : AppCompatActivity() {
+class PropertyDetailActivity : AppCompatActivity(), PropertyDetail.View {
 
     // Screen Configuration
     val pdid = "FMLSRESALL590241548396306"
-    val baseUrl = "https://www.searchstarlingcityareahomes.com"
     val loggingTag = "Property Detail"
 
-    // API Service
-    lateinit var api: API
-
-    // Property
-    lateinit var property: Property
-    var favorite = false
+    // Presenter
+    val presenter = PropertyDetailPresenter(this)
 
     // Views
     lateinit var toolbar: Toolbar
@@ -45,6 +35,7 @@ class PropertyDetailActivity : AppCompatActivity() {
     lateinit var description: TextView
     lateinit var propertyImage: ImageView
     lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
+    lateinit var mainLayout: CoordinatorLayout
 
     // Activity Creation
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,8 +45,7 @@ class PropertyDetailActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         setupFAB(fab)
 
-        api = createAPIService()
-        fetchAndDisplayProperty(api)
+        presenter.fetchProperty(pdid)
     }
 
     // Setup View
@@ -70,59 +60,35 @@ class PropertyDetailActivity : AppCompatActivity() {
         description = findViewById(R.id.description)
         collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar_layout)
         propertyImage = findViewById(R.id.property_image)
+        mainLayout = findViewById(R.id.property_detail_layout)
     }
 
     // Setup FAB
     private fun setupFAB(fab: FloatingActionButton) {
-        fab.setOnClickListener({ view ->
+        fab.setOnClickListener({ _ ->
             run {
-                favorite = !favorite
-                fab.setImageResource(if (favorite) R.drawable.ic_favorite_white_24dp else R.drawable.ic_favorite_border_white_24dp)
-                Snackbar.make(view, "Property " + if (favorite) "Liked" else "Unliked", Snackbar.LENGTH_SHORT)
-                        .setAction("Undo", null).show()
+                presenter.propertyLikeToggleClicked()
             }
         })
     }
 
-    // Setup API Service
-    private fun createAPIService(): API {
-        val client = OkHttpClient.Builder()
-                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .build()
-
-        val retrofit = Retrofit.Builder()
-                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-                .baseUrl(baseUrl)
-                .client(client)
-                .build()
-
-        return retrofit.create(API::class.java)
+    override fun displayProperty(property: Property) {
+        setToolbarTitle(property)
+        setBannerImage(property)
+        displaySummary(property)
+        displayDescription(property)
     }
 
-    // Fetch and Display Property
-    private fun fetchAndDisplayProperty(api: API) {
-        val call = api.getPropertyDetails(pdid)
-        call.enqueue(object : Callback<Property> {
-            override fun onResponse(call: Call<Property>, response: Response<Property>) {
-                if (response.isSuccessful) {
-                    property = response.body() as Property
+    // Set Liked Status on FAB
+    override fun setLiked(liked: Boolean) {
+        fab.setImageResource(if (liked) R.drawable.ic_favorite_white_24dp else R.drawable.ic_favorite_border_white_24dp)
+        Snackbar.make(mainLayout, "Property " + if (liked) "Liked" else "Unliked", Snackbar.LENGTH_SHORT).show()
+    }
 
-                    setToolbarTitle(property)
-                    setBannerImage(property)
-                    displaySummary(property)
-                    displayDescription(property)
-                } else {
-                    Log.e(loggingTag, "Received Null Property")
-                }
-            }
-
-            override fun onFailure(call: Call<Property>, t: Throwable) {
-                // Handle Error From Network
-                showError("Error Fetchin Property")
-                Log.e(loggingTag, "Network Error: " + t.localizedMessage)
-            }
-        })
+    // Display Error Message
+    override fun displayError(errorMessage: String) {
+        Log.e(loggingTag, errorMessage)
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
     // Set Toolbar Title
@@ -148,11 +114,6 @@ class PropertyDetailActivity : AppCompatActivity() {
     private fun displayDescription(property: Property) {
         description.text = property.remarks
 
-    }
-
-    // Show Error Message
-    private fun showError(errorMessage: String) {
-        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
 }

@@ -1,4 +1,4 @@
-package com.cinc.guild
+package com.cinc.guild.propertydetail.model.api
 
 import retrofit2.Call
 import retrofit2.http.GET
