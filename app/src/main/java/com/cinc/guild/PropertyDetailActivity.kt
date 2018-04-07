@@ -1,16 +1,17 @@
 package com.cinc.guild
 
 import android.os.Bundle
+import android.support.design.widget.CollapsingToolbarLayout
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.google.gson.GsonBuilder
-import kotlinx.android.synthetic.main.activity_property_detail.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -38,8 +39,12 @@ class PropertyDetailActivity : AppCompatActivity() {
     lateinit var toolbar: Toolbar
     lateinit var fab: FloatingActionButton
     lateinit var price: TextView
+    lateinit var beds: TextView
+    lateinit var baths: TextView
     lateinit var sqft: TextView
     lateinit var description: TextView
+    lateinit var propertyImage: ImageView
+    lateinit var collapsingToolbarLayout: CollapsingToolbarLayout
 
     // Activity Creation
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,8 +64,12 @@ class PropertyDetailActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         fab = findViewById(R.id.fab)
         price = findViewById(R.id.price)
+        beds = findViewById(R.id.beds)
+        baths = findViewById(R.id.baths)
         sqft = findViewById(R.id.sqft)
         description = findViewById(R.id.description)
+        collapsingToolbarLayout = findViewById(R.id.collapsing_toolbar_layout)
+        propertyImage = findViewById(R.id.property_image)
     }
 
     // Setup FAB
@@ -118,13 +127,13 @@ class PropertyDetailActivity : AppCompatActivity() {
 
     // Set Toolbar Title
     private fun setToolbarTitle(property: Property) {
-        collapsing_toolbar_layout.isTitleEnabled = false
+        collapsingToolbarLayout.isTitleEnabled = false
         toolbar.title = "${property.streetAddress} - ${property.county}"
     }
 
     // Set Banner Image
     private fun setBannerImage(property: Property) {
-        Glide.with(this).load("http://" + property.media[0].mediaUrl).into(property_image)
+        Glide.with(this).load("http://" + property.media[0].mediaUrl).into(propertyImage)
     }
 
     // Display Property Summary
