@@ -22,19 +22,13 @@ import java.util.concurrent.TimeUnit
 
 class PropertyDetailActivity : AppCompatActivity() {
 
-    // API Service Setup
-    val client = OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .build()
+    // Screen Configuration
+    val pdid = "FMLSRESALL590241548396306"
+    val baseUrl = "https://www.searchstarlingcityareahomes.com"
+    val loggingTag = "Property Detail"
 
-    val retrofit = Retrofit.Builder()
-            .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
-            .baseUrl("https://www.searchstarlingcityareahomes.com")
-            .client(client)
-            .build()
-
-    val api = retrofit.create(API::class.java)
+    // API Service
+    lateinit var api: API
 
     // Property
     lateinit var property: Property
@@ -47,65 +41,109 @@ class PropertyDetailActivity : AppCompatActivity() {
     lateinit var sqft: TextView
     lateinit var description: TextView
 
+    // Activity Creation
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val activity = this
 
-        // Setup View
+        setupView()
+        setSupportActionBar(toolbar)
+        setupFAB(fab)
+
+        api = createAPIService()
+        fetchAndDisplayProperty(api)
+    }
+
+    // Setup View
+    private fun setupView() {
         setContentView(R.layout.activity_property_detail)
         toolbar = findViewById(R.id.toolbar)
         fab = findViewById(R.id.fab)
         price = findViewById(R.id.price)
         sqft = findViewById(R.id.sqft)
         description = findViewById(R.id.description)
+    }
 
-        // Setup Toolbar
-        setSupportActionBar(toolbar)
-
-        // Setup FAB
+    // Setup FAB
+    private fun setupFAB(fab: FloatingActionButton) {
         fab.setOnClickListener({ view ->
             run {
-                favorite = ! favorite
+                favorite = !favorite
                 fab.setImageResource(if (favorite) R.drawable.ic_favorite_white_24dp else R.drawable.ic_favorite_border_white_24dp)
                 Snackbar.make(view, "Property " + if (favorite) "Liked" else "Unliked", Snackbar.LENGTH_SHORT)
                         .setAction("Undo", null).show()
             }
         })
+    }
 
-        // Fetch Property
-        val call = api.getPropertyDetails("FMLSRESALL590241548396306")
-        call.enqueue(object: Callback<Property> {
+    // Setup API Service
+    private fun createAPIService(): API {
+        val client = OkHttpClient.Builder()
+                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .build()
+
+        val retrofit = Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create(GsonBuilder().create()))
+                .baseUrl(baseUrl)
+                .client(client)
+                .build()
+
+        return retrofit.create(API::class.java)
+    }
+
+    // Fetch and Display Property
+    private fun fetchAndDisplayProperty(api: API) {
+        val call = api.getPropertyDetails(pdid)
+        call.enqueue(object : Callback<Property> {
             override fun onResponse(call: Call<Property>, response: Response<Property>) {
                 if (response.isSuccessful) {
                     property = response.body() as Property
 
-                    // Set Toolbar Title
-                    collapsing_toolbar_layout.isTitleEnabled = false
-                    toolbar.title = "${property.streetAddress} - ${property.county}"
-
-                    // Set Banner Image
-                    Glide.with(activity).load("http://" + property.media[0].mediaUrl).into(property_image)
-
-                    // Set Summary Card Info
-                    price.text = property.priceFriendly
-                    beds.text = "${property.beds} Beds"
-                    baths.text = "${property.baths} Baths"
-                    sqft.text = "${property.sqFtFriendly} Sqft"
-
-                    // Set Description Info
-                    description.text = property.remarks
-
+                    setToolbarTitle(property)
+                    setBannerImage(property)
+                    displaySummary(property)
+                    displayDescription(property)
                 } else {
-                    Log.e("Property Detail", "Received Null Property")
+                    Log.e(loggingTag, "Received Null Property")
                 }
             }
 
             override fun onFailure(call: Call<Property>, t: Throwable) {
                 // Handle Error From Network
-                Log.e("Property Detail", "Network Error: " + t.localizedMessage)
-                Toast.makeText(activity, "Error Fetchin Property", Toast.LENGTH_LONG).show()
+                showError("Error Fetchin Property")
+                Log.e(loggingTag, "Network Error: " + t.localizedMessage)
             }
         })
+    }
+
+    // Set Toolbar Title
+    private fun setToolbarTitle(property: Property) {
+        collapsing_toolbar_layout.isTitleEnabled = false
+        toolbar.title = "${property.streetAddress} - ${property.county}"
+    }
+
+    // Set Banner Image
+    private fun setBannerImage(property: Property) {
+        Glide.with(this).load("http://" + property.media[0].mediaUrl).into(property_image)
+    }
+
+    // Display Property Summary
+    private fun displaySummary(property: Property) {
+        price.text = property.priceFriendly
+        beds.text = "${property.beds} Beds"
+        baths.text = "${property.baths} Baths"
+        sqft.text = "${property.sqFtFriendly} Sqft"
+    }
+
+    // Display Property Description
+    private fun displayDescription(property: Property) {
+        description.text = property.remarks
+
+    }
+
+    // Show Error Message
+    private fun showError(errorMessage: String) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show()
     }
 
 }
