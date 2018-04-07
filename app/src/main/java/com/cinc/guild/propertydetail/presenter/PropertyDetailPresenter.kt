@@ -1,4 +1,7 @@
-package com.cinc.guild
+package com.cinc.guild.propertydetail.presenter
+
+import com.cinc.guild.propertydetail.PropertyDetail
+import com.cinc.guild.propertydetail.PropertyModel
 
 class PropertyDetailPresenter(val view: PropertyDetail.View): PropertyDetail.Presenter {
 

@@ -1,4 +1,6 @@
-package com.cinc.guild
+package com.cinc.guild.propertydetail
+
+import com.cinc.guild.propertydetail.model.api.Property
 
 interface PropertyDetail {
     interface View {

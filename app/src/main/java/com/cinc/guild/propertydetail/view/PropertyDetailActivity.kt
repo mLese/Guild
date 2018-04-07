@@ -1,4 +1,4 @@
-package com.cinc.guild
+package com.cinc.guild.propertydetail.view
 
 import android.os.Bundle
 import android.support.design.widget.CollapsingToolbarLayout
@@ -12,9 +12,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.cinc.guild.R
+import com.cinc.guild.propertydetail.PropertyDetail
+import com.cinc.guild.propertydetail.model.api.Property
+import com.cinc.guild.propertydetail.presenter.PropertyDetailPresenter
 
 class PropertyDetailActivity : AppCompatActivity(), PropertyDetail.View {
 
@@ -72,6 +73,7 @@ class PropertyDetailActivity : AppCompatActivity(), PropertyDetail.View {
         })
     }
 
+    // Display Property
     override fun displayProperty(property: Property) {
         setToolbarTitle(property)
         setBannerImage(property)
