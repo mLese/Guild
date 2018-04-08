@@ -1,11 +1,11 @@
 package com.cinc.guild.propertydetail.presenter
 
 import com.cinc.guild.propertydetail.PropertyDetail
-import com.cinc.guild.propertydetail.PropertyModel
+import com.cinc.guild.propertydetail.PropertyDetailModel
 
 class PropertyDetailPresenter(val view: PropertyDetail.View): PropertyDetail.Presenter {
 
-    val propertyModel = PropertyModel()
+    val propertyModel = PropertyDetailModel()
 
     // Fetch Property From Model
     override fun fetchProperty(pdid: String) {

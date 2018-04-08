@@ -1,5 +1,6 @@
 package com.cinc.guild.propertydetail
 
+import com.cinc.guild.propertydetail.model.PropertyDetailViewModel
 import com.cinc.guild.propertydetail.model.api.API
 import com.cinc.guild.propertydetail.model.api.Property
 import com.google.gson.GsonBuilder
@@ -12,7 +13,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
-class PropertyModel : PropertyDetail.PropertyModel {
+class PropertyDetailModel : PropertyDetail.PropertyModel {
 
     private val baseUrl = "https://www.searchstarlingcityareahomes.com"
     private val api: API
@@ -24,7 +25,7 @@ class PropertyModel : PropertyDetail.PropertyModel {
 
     // Fetch Property From Network
     override fun fetchProperty(pdid: String,
-                               propertyCallback: (property: Property) -> Unit,
+                               propertyCallback: (property: PropertyDetailViewModel) -> Unit,
                                errorCallback: (errorMessage: String) -> Unit) {
         val call = api.getPropertyDetails(pdid)
         call.enqueue(object : Callback<Property> {
@@ -32,7 +33,9 @@ class PropertyModel : PropertyDetail.PropertyModel {
                 if (response.isSuccessful) {
                     val propertyResponse = response.body() as Property
                     property = propertyResponse
-                    propertyCallback(propertyResponse)
+
+                    val propertyDetailViewModel = PropertyDetailViewModel(property)
+                    propertyCallback(propertyDetailViewModel)
                 } else {
                     errorCallback("Received Null Property")
                 }

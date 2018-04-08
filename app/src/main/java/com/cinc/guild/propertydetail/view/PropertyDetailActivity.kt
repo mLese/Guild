@@ -14,7 +14,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.cinc.guild.R
 import com.cinc.guild.propertydetail.PropertyDetail
-import com.cinc.guild.propertydetail.model.api.Property
+import com.cinc.guild.propertydetail.model.PropertyDetailViewModel
 import com.cinc.guild.propertydetail.presenter.PropertyDetailPresenter
 
 class PropertyDetailActivity : AppCompatActivity(), PropertyDetail.View {
@@ -74,7 +74,7 @@ class PropertyDetailActivity : AppCompatActivity(), PropertyDetail.View {
     }
 
     // Display Property
-    override fun displayProperty(property: Property) {
+    override fun displayProperty(property: PropertyDetailViewModel) {
         setToolbarTitle(property)
         setBannerImage(property)
         displaySummary(property)
@@ -94,27 +94,27 @@ class PropertyDetailActivity : AppCompatActivity(), PropertyDetail.View {
     }
 
     // Set Toolbar Title
-    private fun setToolbarTitle(property: Property) {
+    private fun setToolbarTitle(property: PropertyDetailViewModel) {
         collapsingToolbarLayout.isTitleEnabled = false
-        toolbar.title = "${property.streetAddress} - ${property.county}"
+        toolbar.title = property.title
     }
 
     // Set Banner Image
-    private fun setBannerImage(property: Property) {
-        Glide.with(this).load("http://" + property.media[0].mediaUrl).into(propertyImage)
+    private fun setBannerImage(property: PropertyDetailViewModel) {
+        Glide.with(this).load(property.bannerImageUrl).into(propertyImage)
     }
 
     // Display Property Summary
-    private fun displaySummary(property: Property) {
-        price.text = property.priceFriendly
-        beds.text = "${property.beds} Beds"
-        baths.text = "${property.baths} Baths"
-        sqft.text = "${property.sqFtFriendly} Sqft"
+    private fun displaySummary(property: PropertyDetailViewModel) {
+        price.text = property.price
+        beds.text = property.beds
+        baths.text = property.baths
+        sqft.text = property.squareFootage
     }
 
     // Display Property Description
-    private fun displayDescription(property: Property) {
-        description.text = property.remarks
+    private fun displayDescription(property: PropertyDetailViewModel) {
+        description.text = property.description
 
     }
 

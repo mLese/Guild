@@ -1,10 +1,10 @@
 package com.cinc.guild.propertydetail
 
-import com.cinc.guild.propertydetail.model.api.Property
+import com.cinc.guild.propertydetail.model.PropertyDetailViewModel
 
 interface PropertyDetail {
     interface View {
-        fun displayProperty(property: Property)
+        fun displayProperty(property: PropertyDetailViewModel)
         fun setLiked(liked: Boolean)
         fun displayError(errorMessage: String)
     }
@@ -16,7 +16,7 @@ interface PropertyDetail {
 
     interface PropertyModel {
         fun fetchProperty(pdid: String,
-                          propertyCallback: (property: Property) -> Unit,
+                          propertyCallback: (property: PropertyDetailViewModel) -> Unit,
                           errorCallback: (errorMessage: String) -> Unit)
         fun propertyLikeToggle(): Boolean
     }
