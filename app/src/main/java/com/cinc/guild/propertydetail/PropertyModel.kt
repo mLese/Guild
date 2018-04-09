@@ -1,5 +1,7 @@
 package com.cinc.guild
 
+import com.cinc.guild.propertydetail.model.api.API
+import com.cinc.guild.propertydetail.model.api.Property
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.cinc.guild.propertydetail.model.api.Property
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response

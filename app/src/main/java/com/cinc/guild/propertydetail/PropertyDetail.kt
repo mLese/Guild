@@ -1,5 +1,7 @@
 package com.cinc.guild
 
+import com.cinc.guild.propertydetail.model.api.Property
+
 interface PropertyDetail {
     interface View {
         fun displayProperty(property: Property)

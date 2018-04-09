@@ -1,5 +1,6 @@
 package com.cinc.guild.propertydetail
 
+import com.cinc.guild.PropertyDetail
 import com.cinc.guild.propertydetail.model.api.API
 import com.cinc.guild.propertydetail.model.api.Property
 import com.google.gson.GsonBuilder
